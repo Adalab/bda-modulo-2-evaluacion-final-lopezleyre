@@ -161,11 +161,20 @@ INNER JOIN inventory USING (film_id)
 INNER JOIN rental USING (inventory_id)
 WHERE rental_id IN (SELECT rental_id
 					FROM rental
-                    WHERE (DATEDIFF(return_date, rental_date)) > 5); -- subconsulta para sacar la fecha que han alquilado más de 5 días
+					WHERE (DATEDIFF(return_date, rental_date)) > 5); -- subconsulta para sacar la fecha que han alquilado más de 5 días
 
 /* 23. Encuentra el nombre y apellido de los actores que no han actuado en ninguna película de la categoría "Horror".
 Utiliza una subconsulta para encontrar los actores que han actuado en películas de la categoría "Horror" y luego
 exclúyelos de la lista de actores. */
+
+SELECT CONCAT(first_name, ' ', last_name) AS ActorsName
+FROM actor
+WHERE actor_id NOT IN (SELECT actor_id
+						FROM actor
+                        INNER JOIN film_actor USING (actor_id)
+						INNER JOIN film_category USING (film_id)
+						INNER JOIN category USING (category_id)
+                        WHERE name = 'Horror');
 
 /* 24. BONUS: Encuentra el título de las películas que son comedias y tienen una duración mayor a 180 minutos en la
 tabla film. */
