@@ -178,6 +178,22 @@ WHERE actor_id NOT IN (SELECT actor_id
 
 /* 24. BONUS: Encuentra el título de las películas que son comedias y tienen una duración mayor a 180 minutos en la
 tabla film. */
+
+SELECT f.title 
+FROM film AS f
+INNER JOIN film_category USING (film_id)
+INNER JOIN category AS cat USING (category_id)
+WHERE cat.name = 'Comedy' AND f.length > 180;
+
 /* 25. BONUS: Encuentra todos los actores que han actuado juntos en al menos una película. La consulta debe
 mostrar el nombre y apellido de los actores y el número de películas en las que han actuado juntos. */
+
+SELECT CONCAT(a1.first_name, ' ', a1.last_name) AS ActorName, CONCAT(a2.first_name, ' ', a2.last_name) AS ActorName2, COUNT(fa.film_id) AS MoviesInCommon
+FROM actor AS a1, actor AS a2
+INNER JOIN film_actor AS fa USING (actor_id)
+WHERE a1.actor_id <> a2.actor_id 
+GROUP BY ActorName, ActorName2
+HAVING COUNT(fa.film_id) > 0;
+
+
 
