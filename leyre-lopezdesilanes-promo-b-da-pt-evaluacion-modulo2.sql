@@ -202,12 +202,22 @@ WHERE cat.name = 'Comedy' AND f.length > 180;
 /* 25. BONUS: Encuentra todos los actores que han actuado juntos en al menos una película. La consulta debe
 mostrar el nombre y apellido de los actores y el número de películas en las que han actuado juntos. */
 
-SELECT CONCAT(a1.first_name, ' ', a1.last_name) AS ActorName, CONCAT(a2.first_name, ' ', a2.last_name) AS ActorName2, COUNT(fa.film_id) AS MoviesInCommon
-FROM actor AS a1, actor AS a2 -- self join
-INNER JOIN film_actor AS fa USING (actor_id)
-WHERE a1.actor_id <> a2.actor_id -- para que cada actor no se compare consigo mismo
-GROUP BY ActorName, ActorName2 -- se agrupa por los dos porque agrupas por películas en común de ambos actores
-HAVING MoviesInCommon > 0;
+WITH JoinActor AS (
+	SELECT fa1.actor_id AS actor1, fa2.actor_id AS actor2, COUNT(fa1.film_id) AS MoviesInCommon
+    FROM film_actor AS fa1, film_actor AS fa2
+    WHERE fa1.actor_id <> fa2.actor_id -- para que cada actor no se compare consigo mismo
+    AND fa1.film_id = fa2.film_id -- para indicar que la película es la misma para ambos actores
+    GROUP BY fa1.actor_id, fa2.actor_id -- para agrupar por pareja de actores
+    HAVING COUNT(fa1.film_id) > 0)
+
+SELECT CONCAT(a1.first_name, ' ', a1.last_name) AS ActorName, CONCAT(a2.first_name, ' ', a2.last_name) AS ActorName2, ja.MoviesInCommon
+FROM JoinActor AS ja
+INNER JOIN actor as a1
+ON a1.actor_id = ja.actor1 -- inner join con la tabla 1 actor
+INNER JOIN actor as a2
+ON a2.actor_id = ja.actor2 -- inner join con la tabla 2 actor
+ORDER BY ActorName, ActorName2;
+
 
 
 
